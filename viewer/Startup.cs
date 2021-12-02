@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.ApplicationInsights.Extensibility;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -28,10 +29,15 @@ namespace viewer
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
+            services.AddHttpContextAccessor();
+            services.AddApplicationInsightsTelemetry();
+
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
 
             // Awwww yeah!
             services.AddSignalR();
+
+            services.AddSingleton<ITelemetryInitializer, TelemetryHeadersInitializer>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -60,6 +66,8 @@ namespace viewer
                         name: "default",
                         pattern: "{controller=Home}/{action=Index}/{id?}");                
             });
+
+        
         }
     }
 }
